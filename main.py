@@ -5,10 +5,13 @@ import gym
 import imageio
 import pddlgym
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from datetime import datetime
 from pddlgym.inference import check_goal
 from mdp import get_all_reachable, vi
+
+matplotlib.use('agg')
 
 sys.setrecursionlimit(5000)
 
