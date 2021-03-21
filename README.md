@@ -12,6 +12,6 @@ You can do the former by settting up a virtual env ([see here](https://github.co
 ## Usage
 For usage instructions, run `python main.py --help` in the repository's root folder
 
-The following command example can be used to solve the `PDDLEnvBlocks-v0` environment, simulate an episode with the resulting polic and rendering each encountered observation:
+The following command example can be used to solve the `PDDLEnvBlocks-v0` environment, simulate an episode with the resulting policy and render each encountered observation:
 
 `$ python main.py --env PDDLEnvBlocks-v0 --simulate --render_and_save`
