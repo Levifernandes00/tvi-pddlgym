@@ -5,7 +5,7 @@ This repository contains a sample implementation that can solve MDPs represented
 This implementation uses the function `get_successor_states` imported from PDDLGym's `core` module (`pddlgym.core`).
 Since this feature is currently available in PDDLGym's repository but not in its latest pypi release as of now,
 to use it you'll need to either clone the repository and install it locally or install it via pip by pointing to the repository.
-You can do the former by settting up a virtual env ([see here](https://github.com/tomsilver/pddlgym#installing-from-source-if-you-want-to-make-changes-to-pddlgym)) or the latter by running the following:
+You can do the former by setting up a virtual env ([see here](https://github.com/tomsilver/pddlgym#installing-from-source-if-you-want-to-make-changes-to-pddlgym)) or the latter by running the following:
 
 `$ pip install git+https://github.com/tomsilver/pddlgym`
 
