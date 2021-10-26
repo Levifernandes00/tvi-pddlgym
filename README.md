@@ -1,5 +1,7 @@
-# vi-pddlgym
+# tvi-pddlgym
+Using Gabriel Crispino Code, implemented topological value iteration.
 
+# vi-pddlgym
 This repository contains a sample implementation that can solve MDPs represented by PDDLGym environments using the Value Iteration algorithm.
 
 This implementation uses the function `get_successor_states` imported from PDDLGym's `core` module (`pddlgym.core`).

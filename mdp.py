@@ -23,19 +23,18 @@ def get_all_reachable(s, A, env, reach=None):
     return reach
 
 
-def vi(S, succ_states, A, V_i, G_i, goal, env, gamma, epsilon):
-
-    V = np.zeros(len(V_i))
+def vi(S, succ_states, A, V_i, G_i, goal, env, gamma, epsilon, V, pi):
     P = np.zeros(len(V_i))
-    pi = np.full(len(V_i), None)
-    print(len(S), len(V_i), len(G_i), len(P))
-    print(G_i)
+
+    # print(len(S), len(V_i), len(G_i), len(P))
+    # print(G_i)
     P[G_i] = 1
 
     i = 0
+    updates = 0
     diff = np.inf
     while True:
-        print('Iteration', i, diff)
+        # print('Iteration', i, diff)
         V_ = np.copy(V)
         P_ = np.copy(P)
 
@@ -47,12 +46,13 @@ def vi(S, succ_states, A, V_i, G_i, goal, env, gamma, epsilon):
             cost = 1
             for i_a, a in enumerate(A):
                 succ = succ_states[s, a]
-
+                
                 probs = np.fromiter(iter(succ.values()), dtype=float)
                 succ_i = [V_i[succ_s] for succ_s in succ_states[s, a]]
                 Q[i_a] = cost + np.dot(probs, gamma * V_[succ_i])
                 Q_p[i_a] = np.dot(probs, P_[succ_i])
             V[V_i[s]] = np.min(Q)
+            updates += 1
             P[V_i[s]] = np.max(Q_p)
             pi[V_i[s]] = A[np.argmin(Q)]
 
@@ -60,4 +60,4 @@ def vi(S, succ_states, A, V_i, G_i, goal, env, gamma, epsilon):
         if diff < epsilon:
             break
         i += 1
-    return V, pi
+    return V, pi, updates

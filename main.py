@@ -10,14 +10,16 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from pddlgym.inference import check_goal
 from mdp import get_all_reachable, vi
+from scc import SCC
+import time
 
 matplotlib.use('agg')
 
 sys.setrecursionlimit(5000)
 
 DEFAULT_PROB_INDEX = 0
-DEFAULT_EPSILON = 0.1
-DEFAULT_GAMMA = 0.99
+DEFAULT_EPSILON = 0.01
+DEFAULT_GAMMA = 0.999
 DEFAULT_SIMULATE = False
 DEFAULT_RENDER_AND_SAVE = False
 DEFAULT_PRINT_SIM_HISTORY = False
@@ -133,9 +135,9 @@ def run_episode(pi,
             break
     return i, cum_reward
 
-
 args = parse_args()
 
+start = time.time()
 env = gym.make(args.env)
 problem_index = args.problem_index
 env.fix_problem_index(problem_index)
@@ -146,28 +148,46 @@ prob_objects = frozenset(problem.objects)
 obs, _ = env.reset()
 A = list(sorted(env.action_space.all_ground_literals(obs, valid_only=False)))
 
-print(' calculating list of states...')
+# print(' calculating list of states...')
 reach = get_all_reachable(obs, A, env)
 S = list(sorted([s for s in reach]))
-print('Number of states:', len(S))
+# print('Number of states:', len(S))
 
-print('done')
+# print('done')
 V_i = {s: i for i, s in enumerate(S)}
 G_i = [V_i[s] for s in V_i if check_goal(s, goal)]
 
-print('obtaining optimal policy')
+# print('obtaining optimal policy')
 succ_states = {s: {} for s in reach}
+
 for s in reach:
     for a in A:
         succ_states[s, a] = reach[s][a]
-V, pi = vi(S, succ_states, A, V_i, G_i, goal, env, args.gamma, args.epsilon)
+
+scc = SCC(reach)
+componentes = scc.execute()
+componentes.reverse()
+
+count = 0
+pi = np.full(len(V_i), None)
+V = np.zeros(len(V_i))
+updates = 0 
+for component in componentes:
+    S = [s for s in reach if s in component]
+    V_, pi_, _updates = vi(S, succ_states, A, V_i, G_i, goal, env, args.gamma, args.epsilon, V, pi)
+    V = V_
+    pi = pi_
+    updates = updates + _updates
+print("updates -> ", updates)
+print("politics ->", V)
+
 pi_func = lambda s: pi[V_i[s]]
 
 n_episodes = 1000
 
 plot = False
 if args.plot_stats:
-    print('running episodes with optimal policy')
+    # print('running episodes with optimal policy')
     steps1 = []
     rewards1 = []
     for i in range(n_episodes):
@@ -175,7 +195,7 @@ if args.plot_stats:
         steps1.append(n_steps)
         rewards1.append(reward)
 
-    print('running episodes with random policy')
+    # print('running episodes with random policy')
     steps2 = []
     rewards2 = []
     for i in range(n_episodes):
@@ -204,3 +224,5 @@ if args.simulate:
                           render_and_save=args.render_and_save,
                           output_dir=args.output_dir,
                           print_history=args.print_sim_history)
+end = time.time()
+print("Runtime of the program is ", (end - start)*1000)
